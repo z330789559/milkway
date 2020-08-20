@@ -23,7 +23,8 @@ const layouts = {
     if (config.showLabel === false) labelWidth = '0'
     return (
       <el-col span={config.span}>
-        <el-form-item label-width={labelWidth} prop={scheme.__vModel__}
+        <el-form-item
+    label-width={labelWidth} prop={scheme.__vModel__}
           label={config.showLabel ? config.label : ''}>
           <render conf={scheme} {...{ on: listeners }} />
         </el-form-item>
@@ -136,8 +137,16 @@ export default {
     this.buildRules(data.formConfCopy.fields, data[this.formConf.formRules])
     return data
   },
+  watch: {
+    formConf(newValue, oldValue) {
+      this.formConfCopy = deepClone(newValue)
+      this.initFormData(this.formConfCopy.fields, this[newValue.formModel])
+      this.buildRules(this.formConfCopy.fields, this[newValue.formRules])
+    }
+  },
   methods: {
     initFormData(componentList, formData) {
+      console.log(componentList)
       componentList.forEach(cur => {
         const config = cur.__config__
         if (cur.__vModel__) formData[cur.__vModel__] = config.defaultValue

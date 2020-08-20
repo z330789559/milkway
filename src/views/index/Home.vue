@@ -1,12 +1,12 @@
-
 <template>
   <div class="container">
     <div class="left-board">
       <div class="logo-wrapper">
         <div class="logo">
-          <img :src="logo" alt="logo"> Form Generator
+          <!--<img :src="logo" alt="logo"> Form Generator-->
+          自动代码生成
           <a class="github" href="https://github.com/JakHuang/form-generator" target="_blank">
-            <img src="https://github.githubassets.com/pinned-octocat.svg" alt>
+            <!--<img src="https://github.githubassets.com/pinned-octocat.svg" alt>-->
           </a>
         </div>
       </div>
@@ -50,6 +50,9 @@
         </el-button>
         <el-button icon="el-icon-view" type="text" @click="showJson">
           查看json
+        </el-button>
+        <el-button icon="el-icon-view" type="text" @click="publish">
+         发布为独立项目
         </el-button>
         <el-button icon="el-icon-download" type="text" @click="download">
           导出vue文件
@@ -360,6 +363,11 @@ export default {
       const html = vueTemplate(makeUpHtml(this.formData, type))
       const css = cssStyle(makeUpCss(this.formData))
       return beautifier.html(html + script + css, beautifierConf.html)
+    },
+
+    publish() {
+      this.AssembleFormData()
+      console.log(this.formData)
     },
     showJson() {
       this.AssembleFormData()

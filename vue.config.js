@@ -10,14 +10,14 @@ const minify = process.env.NODE_ENV === 'development' ? false : {
   minifyCSS: true,
   minifyJS: true
 }
-
+const platForm = process.argv.pop()
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/form-generator/'
+    ? '/munitions/'
     : '/',
   pages: {
     index: {
@@ -64,5 +64,10 @@ module.exports = {
         symbolId: 'icon-[name]'
       })
       .end()
+    config.plugin('define')
+      .tap(args => {
+        args[0].STYLE_URL = JSON.stringify(platForm === 'mobile' ? 'https://unpkg.com/mint-ui/lib/style.css' : 'https://lib.baomitu.com/element-ui/2.13.2/theme-chalk/index.css')
+        return args
+      })
   }
 }

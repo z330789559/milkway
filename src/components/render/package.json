@@ -1,6 +1,6 @@
 {
-  "name": "form-gen-render",
-  "version": "1.0.4",
+  "name": "yyf-form-gen-render",
+  "version": "1.0.5",
   "description": "表单核心render",
   "main": "lib/form-gen-render.umd.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/JakHuang/form-generator.git"
   },
-  "author": "jakhuang",
+  "author": "libaozhong",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/JakHuang/form-generator/issues"
