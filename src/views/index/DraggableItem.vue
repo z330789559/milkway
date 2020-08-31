@@ -20,6 +20,35 @@ const components = {
   }
 }
 const layouts = {
+  table(h, element, index, parent) {
+    const { activeItem } = this.$listeners
+    const config = element.__config__
+    const className = this.activeId === element.__config__.formId
+      ? 'drawing-row-item active-from-item'
+      : 'drawing-row-item'
+    let child = <render key={config.renderKey} conf={element} onInput={ event => {
+      this.$set(config, 'defaultValue', event)
+    }} />
+    if (element.type === 'flex') {
+      child = <el-row type={element.type} justify={element.justify} align={element.align}>
+        {child}
+      </el-row>
+    }
+    return (
+      <el-col span={element.__config__.span}>
+        <el-row gutter={element.__config__.gutter} class={className}
+                nativeOnClick={event => {
+                  activeItem(element)
+                  event.stopPropagation()
+                }}>
+          <span class="component-name">{element.__config__.componentName}</span>
+          <draggable list={element.__config__.children} animation={340} group="componentsGroup" class="drag-wrapper">
+            {child}
+          </draggable>
+          {components.itemBtns.apply(this, arguments)}
+        </el-row>
+      </el-col>)
+  },
   colFormItem(h, element, index, parent) {
     const { activeItem } = this.$listeners
     const config = element.__config__

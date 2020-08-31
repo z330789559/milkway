@@ -4,7 +4,7 @@
       <div class="logo-wrapper">
         <div class="logo">
           <!--<img :src="logo" alt="logo"> Form Generator-->
-          自动代码生成
+          代码基地
           <a class="github" href="https://github.com/JakHuang/form-generator" target="_blank">
             <!--<img src="https://github.githubassets.com/pinned-octocat.svg" alt>-->
           </a>
@@ -52,7 +52,7 @@
           查看json
         </el-button>
         <el-button icon="el-icon-view" type="text" @click="publish">
-         发布为独立项目
+          发布为独立项目
         </el-button>
         <el-button icon="el-icon-download" type="text" @click="download">
           导出vue文件
@@ -133,7 +133,7 @@ import FormDrawer from './FormDrawer'
 import JsonDrawer from './JsonDrawer'
 import RightPanel from './RightPanel'
 import {
-  inputComponents, selectComponents, layoutComponents, formConf
+  inputComponents, selectComponents, layoutComponents, tableComponents, formConf
 } from '@/components/generator/config'
 import {
   exportDefault, beautifierConf, isNumberStr, titleCase, deepClone
@@ -178,6 +178,7 @@ export default {
       inputComponents,
       selectComponents,
       layoutComponents,
+      tableComponents,
       labelWidth: 100,
       drawingList: drawingDefalut,
       drawingData: {},
@@ -203,6 +204,9 @@ export default {
         {
           title: '布局型组件',
           list: layoutComponents
+        }, {
+          title: '表单',
+          list: tableComponents
         }
       ]
     }

@@ -543,3 +543,73 @@ export const layoutComponents = [
     disabled: false
   }
 ]
+
+// 表单 【左面板】
+export const tableComponents = [
+  {
+    __config__: {
+      defaultSort: '{prop: "date", order: "descending"}',
+      maxHeight: '1000',
+      height: '250',
+      types: [
+        {
+          label: '基础的',
+          value: ''
+        }, {
+          label: '斑马纹',
+          value: 'stripe'
+        }, {
+          label: '边框',
+          value: 'border'
+        }
+
+      ],
+      tagIcon: 'table',
+      span: 24,
+      layout: 'table',
+      tag: 'el-table',
+      changeTag: false,
+      document: 'https://element.eleme.cn/#/zh-CN/component/table'
+    },
+    props: {
+      data: [
+        {
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-04',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1517 弄'
+        }, {
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }, {
+          date: '2016-05-03',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1516 弄'
+        }
+      ]
+    },
+    __slot__: {
+      columns: [{
+        prop: 'date', label: '日期', width: 180, fixed: false
+      }, {
+        prop: 'name', label: '名称', width: 180, fixed: false
+      }, {
+        prop: 'address', label: '地址', width: 180, fixed: false
+      }]
+    },
+    data: [],
+    type: '',
+    stripe: false,
+    border: false,
+    icon: 'el-icon-table',
+    round: false,
+    size: 'medium',
+    plain: false,
+    circle: false,
+    disabled: false
+  }
+]

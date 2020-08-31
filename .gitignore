@@ -1,6 +1,5 @@
 .DS_Store
 node_modules
-/dist
 /src/components/parser/lib
 /src/components/render/lib
 /src/components/tinymce/lib

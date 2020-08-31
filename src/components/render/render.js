@@ -47,7 +47,6 @@ function emitEvents(confClone) {
 }
 
 function buildDataObject(confClone, dataObject) {
-  debugger
   Object.keys(confClone).forEach(key => {
     const val = confClone[key]
     if (key === '__vModel__') {

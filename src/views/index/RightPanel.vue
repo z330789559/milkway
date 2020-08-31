@@ -31,6 +31,25 @@
               </el-option-group>
             </el-select>
           </el-form-item>
+
+          <el-form-item v-if="hasTableTypes" label="表单类型">
+            <el-select
+              v-model="activeData.type"
+              placeholder="请选择表单类型"
+              :style="{width: '100%'}"
+              @change="tableTypeChange"
+            >
+              <el-option
+                v-for="item in activeData.__config__.types"
+                :key="item.label"
+                :label="item.label"
+                :value="item.value"
+              >
+                <span> {{ item.label }}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+
           <el-form-item v-if="activeData.__vModel__!==undefined" label="字段名">
             <el-input v-model="activeData.__vModel__" placeholder="请输入字段名（v-model）" />
           </el-form-item>
@@ -758,6 +777,9 @@ export default {
       }
       return []
     },
+    hasTableTypes() {
+      return this.activeData.__config__.types && isArray(this.activeData.__config__.types) && this.activeData.__config__.types.length > 0
+    },
     tagList() {
       return [
         {
@@ -929,6 +951,19 @@ export default {
       let target = inputComponents.find(item => item.__config__.tagIcon === tagIcon)
       if (!target) target = selectComponents.find(item => item.__config__.tagIcon === tagIcon)
       this.$emit('tag-change', target)
+    },
+    tableTypeChange(value) {
+      const { types } = this.activeData.__config__
+      const { activeData } = this
+      types.forEach(type => {
+        if (type.value !== '') {
+          if (type.value !== value) {
+            activeData[type.value] = false
+          } else {
+            activeData[type.value] = true
+          }
+        }
+      })
     },
     changeRenderKey() {
       if (needRerenderList.includes(this.activeData.__config__.tag)) {
