@@ -18,7 +18,7 @@ function resolve(dir) {
 
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/munitions/'
+    ? '/dist/'
     : '/',
   pages: {
     index: {
