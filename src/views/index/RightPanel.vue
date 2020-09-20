@@ -2,7 +2,7 @@
   <div class="right-board">
     <el-tabs v-model="currentTab" class="center-tabs">
       <el-tab-pane label="组件属性" name="field" />
-      <el-tab-pane label="表单属性" name="form" />
+      <el-tab-pane label="页面属性" name="form" />
     </el-tabs>
     <div class="field-box">
       <a class="document-link" target="_blank" :href="documentLink" title="查看组件文档">
@@ -32,7 +32,7 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item v-if="hasTableTypes" label="表单类型">
+          <el-form-item v-if="hasTableTypes" label="表格类型">
             <el-select
               v-model="activeData.type"
               placeholder="请选择表单类型"
@@ -580,6 +580,19 @@
           <el-form-item label="表单模型">
             <el-input v-model="formConf.formModel" placeholder="请输入数据模型" />
           </el-form-item>
+          <el-form-item label="选择页面类型">
+            <el-radio-group v-model="formConf.pageType">
+              <el-radio-button label="form">
+                from
+              </el-radio-button>
+              <el-radio-button label="table">
+                table
+              </el-radio-button>
+              <el-radio-button label="page">
+                page
+              </el-radio-button>
+            </el-radio-group>
+          </el-form-item>
           <el-form-item label="校验模型">
             <el-input v-model="formConf.formRules" placeholder="请输入校验模型" />
           </el-form-item>
@@ -914,6 +927,7 @@ export default {
       this.$set(this.activeData, 'format', val)
     },
     spanChange(val) {
+      console.log(val)
       this.formConf.span = val
     },
     multipleChange(val) {

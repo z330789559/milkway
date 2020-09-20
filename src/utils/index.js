@@ -41,6 +41,12 @@ export function isNumberStr(str) {
 
 export const exportDefault = 'export default '
 
+export const ELEMENT_TAG = {
+  elInput: 'el-input',
+  elButton: 'el-button',
+  elTable: 'el-table'
+}
+
 export const beautifierConf = {
   html: {
     indent_size: '2',

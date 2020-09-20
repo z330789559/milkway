@@ -20,12 +20,23 @@ const components = {
   }
 }
 const layouts = {
-  table(h, element, index, parent) {
+  table(h, _element, index, parent) {
+    const element = JSON.parse(JSON.stringify(_element))
     const { activeItem } = this.$listeners
     const config = element.__config__
     const className = this.activeId === element.__config__.formId
       ? 'drawing-row-item active-from-item'
       : 'drawing-row-item'
+    /**
+     *   给props 赋值
+     */
+    Object.keys(element.props).forEach(prop => {
+      if (prop === 'data') {
+        element.props[prop] = config.defaultValue
+      } else {
+        element.props[prop] = config[prop]
+      }
+    })
     let child = <render key={config.renderKey} conf={element} onInput={ event => {
       this.$set(config, 'defaultValue', event)
     }} />
@@ -124,6 +135,7 @@ export default {
     'formConf'
   ],
   render(h) {
+    console.log(this.element.__config__)
     const layout = layouts[this.element.__config__.layout]
 
     if (layout) {

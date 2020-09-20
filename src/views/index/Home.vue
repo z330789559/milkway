@@ -4,7 +4,6 @@
       <div class="logo-wrapper">
         <div class="logo">
           <!--<img :src="logo" alt="logo"> Form Generator-->
-          代码基地
           <a class="github" href="https://github.com/JakHuang/form-generator" target="_blank">
             <!--<img src="https://github.githubassets.com/pinned-octocat.svg" alt>-->
           </a>
@@ -125,6 +124,7 @@
 
 <script>
 import draggable from 'vuedraggable'
+import axios from 'axios'
 import { debounce } from 'throttle-debounce'
 import { saveAs } from 'file-saver'
 import ClipboardJS from 'clipboard'
@@ -153,13 +153,14 @@ import {
 import loadBeautifier from '@/utils/loadBeautifier'
 
 let beautifier
+
 const emptyActiveData = { style: {}, autosize: {} }
 let oldActiveId
 let tempActiveData
 const drawingListInDB = getDrawingList()
 const formConfInDB = getFormConf()
 const idGlobal = getIdGlobal()
-
+const host = 'http://127.0.0.1:8010/'
 export default {
   components: {
     draggable,
@@ -371,6 +372,14 @@ export default {
 
     publish() {
       this.AssembleFormData()
+      const that = this
+      axios.post('/bus/demon/add', { content: JSON.stringify(this.formData), status: '1' }).then(() => {
+        that.$notify({
+          title: '保存',
+          message: '保存成功！',
+          type: 'success'
+        })
+      })
       console.log(this.formData)
     },
     showJson() {

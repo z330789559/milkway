@@ -9,7 +9,8 @@ export const formConf = {
   gutter: 15,
   disabled: false,
   span: 24,
-  formBtns: true
+  formBtns: true,
+  pageType: 'table'
 }
 
 // 输入型组件 【左面板】
@@ -369,7 +370,7 @@ export const selectComponents = [
       required: true,
       regList: [],
       changeTag: true,
-      document: 'https://element.eleme.cn/#/zh-CN/component/time-picker'
+      document: 'https:/__vModel__/element.eleme.cn/#/zh-CN/component/time-picker'
     },
     style: { width: '100%' },
     disabled: false,
@@ -523,6 +524,7 @@ export const layoutComponents = [
     __config__: {
       label: '按钮',
       showLabel: true,
+      defaultValue: null,
       changeTag: true,
       labelWidth: null,
       tag: 'el-button',
@@ -548,31 +550,10 @@ export const layoutComponents = [
 export const tableComponents = [
   {
     __config__: {
-      defaultSort: '{prop: "date", order: "descending"}',
+      defaultSort: { prop: 'date', order: 'descending' },
       maxHeight: '1000',
       height: '250',
-      types: [
-        {
-          label: '基础的',
-          value: ''
-        }, {
-          label: '斑马纹',
-          value: 'stripe'
-        }, {
-          label: '边框',
-          value: 'border'
-        }
-
-      ],
-      tagIcon: 'table',
-      span: 24,
-      layout: 'table',
-      tag: 'el-table',
-      changeTag: false,
-      document: 'https://element.eleme.cn/#/zh-CN/component/table'
-    },
-    props: {
-      data: [
+      defaultValue: [
         {
           date: '2016-05-02',
           name: '王小虎',
@@ -590,7 +571,30 @@ export const tableComponents = [
           name: '王小虎',
           address: '上海市普陀区金沙江路 1516 弄'
         }
-      ]
+      ],
+      types: [
+        {
+          label: '基础的',
+          value: ''
+        }, {
+          label: '斑马纹',
+          value: 'stripe'
+        }, {
+          label: '边框',
+          value: 'border'
+        }
+
+      ],
+      data: 'tableData',
+      tagIcon: 'table',
+      span: 24,
+      layout: 'table',
+      tag: 'el-table',
+      changeTag: false,
+      document: 'https://element.eleme.cn/#/zh-CN/component/table'
+    },
+    props: {
+      data: 'tableData'
     },
     __slot__: {
       columns: [{
@@ -598,10 +602,10 @@ export const tableComponents = [
       }, {
         prop: 'name', label: '名称', width: 180, fixed: false
       }, {
-        prop: 'address', label: '地址', width: 180, fixed: false
+        prop: 'address', label: '地址', fixed: false
       }]
     },
-    data: [],
+    mountMethods: {},
     type: '',
     stripe: false,
     border: false,

@@ -1,4 +1,5 @@
 const path = require('path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const minify = process.env.NODE_ENV === 'development' ? false : {
   collapseWhitespace: true,
@@ -36,14 +37,25 @@ module.exports = {
     }
   },
   devServer: {
-    overlay: false
+    host: 'localhost',
+    overlay: true,
+    proxy: {
+      '/bus': {
+        /* 目标代理服务器地址 */
+        target: 'http://127.0.0.1:8010', //
+        // target: "http://192.168.1.102:8888", //
+        /* 允许跨域 */
+        changeOrigin: true,
+        ws: true
+      }
+    },
+    port: 8080
   },
   productionSourceMap: false,
-  configureWebpack: {
-    externals: {
+  configureWebpack: config => {
+    config.externals = {
       vue: 'Vue',
       'vue-router': 'VueRouter',
-      axios: 'axios',
       'element-ui': 'ELEMENT'
     }
   },

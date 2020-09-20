@@ -1,5 +1,9 @@
 import { isArray } from 'util'
-import { exportDefault, titleCase, deepClone } from '@/utils/index'
+import {
+  exportDefault, titleCase, deepClone, ELEMENT_TAG
+} from '@/utils/index'
+
+import render from '@/components/render/render'
 import ruleTrigger from './ruleTrigger'
 
 const units = {
@@ -63,7 +67,7 @@ function buildAttributes(scheme, dataList, ruleList, optionsList, methodList, pr
   }
 
   // 处理props
-  if (scheme.props && scheme.props.props) {
+  if (scheme.props) {
     buildProps(scheme, propsList)
   }
 
@@ -133,6 +137,9 @@ function mixinMethod(type) {
 // 构建data
 function buildData(scheme, dataList) {
   const config = scheme.__config__
+  /**
+   * table  DATA
+   */
   if (scheme.__vModel__ === undefined) return
   const defaultValue = JSON.stringify(config.defaultValue)
   dataList.push(`${scheme.__vModel__}: ${defaultValue},`)
@@ -175,8 +182,15 @@ function buildOptions(scheme, optionsList) {
 }
 
 function buildProps(scheme, propsList) {
-  const str = `${scheme.__vModel__}Props: ${JSON.stringify(scheme.props.props)},`
-  propsList.push(str)
+  const config = scheme.__config__
+  if (config.tag === ELEMENT_TAG.elTable) {
+    const { data } = config
+    const { columns } = scheme.__slot__
+    propsList.push(`${data}:${JSON.stringify(config.defaultValue)},`)
+    propsList.push(`columns:${JSON.stringify(columns)},`)
+  }
+  // const str = `${scheme.__vModel__}Props: ${JSON.stringify(scheme.props.props)},`
+  // propsList.push(str)
 }
 
 // el-upload的BeforeUpload
@@ -223,8 +237,9 @@ function buildOptionMethod(methodName, model, methodList) {
 }
 
 // js整体拼接
-function buildexport(conf, type, data, rules, selectOptions, uploadVar, props, methods) {
-  const str = `${exportDefault}{
+function buildexport(conf, type, data, rules, selectOptions, uploadVar, props, methods, mountMethods = '') {
+  const str = `
+  ${exportDefault}{
   ${inheritAttrs[type]}
   components: {},
   props: [],
@@ -241,10 +256,13 @@ function buildexport(conf, type, data, rules, selectOptions, uploadVar, props, m
       ${props}
     }
   },
-  computed: {},
+  computed: {
+  },
   watch: {},
   created () {},
-  mounted () {},
+  mounted () {
+     ${mountMethods}
+  },
   methods: {
     ${methods}
   }

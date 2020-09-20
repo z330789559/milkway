@@ -7,6 +7,16 @@
 
 <script>
 import Parser from '../Parser'
+import axios from 'axios'
+
+function getQueryVariable(name) {
+  const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`)
+  console.log(window.location.search)
+  const r = window.location.split('?')[1].match(reg)
+  if (r != null) return decodeURI(r[2])
+  return null
+}
+const host = 'http://121.89.194.107:9300/'
 
 // 若parser是通过安装npm方式集成到项目中的，使用此行引入
 // import Parser from 'form-gen-parser'
@@ -228,20 +238,33 @@ export default {
     //   console.log(this.formConf)
     //   that.fillFormData(this.formConf, fillData)
     // })
+    const id = getQueryVariable('id')
+    console.log(id)
+    axios
+      .get(`${host}platform/api/smConfig/getDetail?id=${id}`)
+      .then(res => {
+        if (res) {
+          this.formConf = res.value
+          // 更新表单
+          this.initShow = true
+        }
+      })
+      .catch(err => { console.log(err) })
 
-    setTimeout(() => {
-      this.formConf = testFormData
-      // 请求回来的表单数据
-      const data = {
-        mobile: '18836662555'
-      }
-      // 回填数据
-      this.fillFormData(this.formConf, data)
-      // 更新表单
-      this.initShow = true
-    }, 2000)
+    // setTimeout(() => {
+    //   this.formConf = testFormData
+    //   // 请求回来的表单数据
+    //   const data = {
+    //     mobile: '18836662555'
+    //   }
+    //   // 回填数据
+    //   this.fillFormData(this.formConf, data)
+    //   // 更新表单
+    //   this.initShow = true
+    // }, 2000)
   },
   methods: {
+
     fillFormData(form, data) {
       form.fields.forEach(item => {
         const val = data[item.__vModel__]

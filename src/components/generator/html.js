@@ -1,8 +1,65 @@
 /* eslint-disable max-len */
 import ruleTrigger from './ruleTrigger'
+import render from '@/components/render/render.js'
+import { ELEMENT_TAG } from '../../utils'
 
 let confGlobal
 let someSpanIsNot24
+
+function makeDataObject() {
+  return {
+    attrs: {},
+    props: {},
+    nativeOn: {},
+    on: {},
+    style: {}
+  }
+}
+
+function clearAttrs(dataObject) {
+  delete dataObject.attrs.__config__
+  delete dataObject.attrs.__slot__
+  delete dataObject.attrs.__methods__
+}
+function renderModel(dataObject, defaultValue) {
+  dataObject.props.value = defaultValue
+
+  dataObject.on.input = val => {
+    this.$emit('input', val)
+  }
+}
+function buildDataObject(confClone, dataObject) {
+  Object.keys(confClone).forEach(key => {
+    const val = confClone[key]
+    const confin = confClone.__config__
+    if (key === '__vModel__') {
+      renderModel.call(this, dataObject, confClone.__config__.defaultValue)
+    } else if (key === 'props') {
+      Object.keys(val).forEach(p => {
+        val[p] = confin[p]
+      })
+      dataObject[key] = { ...dataObject[key], ...val }
+    } else if (dataObject[key]) {
+      dataObject[key] = { ...dataObject[key], ...val }
+    } else {
+      dataObject.attrs[key] = val
+    }
+  })
+
+  // 清理属性
+  clearAttrs(dataObject)
+}
+function rederCoumns(columns) {
+  const list = []
+  columns.forEach(item => {
+    list.push(`<el-table-column
+      prop='${item.prop}'
+      label='${item.label}'
+      width='${item.width}'>
+    </el-table-column>`)
+  })
+  return list.join('\r\n')
+}
 
 export function dialogWrapper(str) {
   return `<el-dialog v-bind="$attrs" v-on="$listeners" @open="onOpen" @close="onClose" title="Dialog Titile">
@@ -34,30 +91,80 @@ export function cssStyle(cssStr) {
   </style>`
 }
 
-function buildFormTemplate(scheme, child, type) {
+function buildFormTemplate(scheme, child, type, table) {
+  console.log(scheme)
   let labelPosition = ''
+  let str = ''
   if (scheme.labelPosition !== 'right') {
     labelPosition = `label-position="${scheme.labelPosition}"`
   }
-  const disabled = scheme.disabled ? `:disabled="${scheme.disabled}"` : ''
-  let str = `<el-form ref="${scheme.formRef}" :model="${scheme.formModel}" :rules="${scheme.formRules}" size="${scheme.size}" ${disabled} label-width="${scheme.labelWidth}px" ${labelPosition}>
-      ${child}
+  /** * form** */
+  if (scheme.pageType === 'form') {
+    const disabled = scheme.disabled ? `:disabled="${scheme.disabled}"` : ''
+    str = `<el-form ref="${scheme.formRef}" :model="${scheme.formModel}" :rules="${scheme.formRules}" size="${scheme.size}" ${disabled} label-width="${scheme.labelWidth}px" ${labelPosition}>
+        ${child}
       ${buildFromBtns(scheme, type)}
-    </el-form>`
-  if (someSpanIsNot24) {
-    str = `<el-row :gutter="${scheme.gutter}">
+    </el-form>
+`
+    if (someSpanIsNot24) {
+      str = `<el-row :gutter="${scheme.gutter}">
         ${str}
       </el-row>`
+    }
+    /** * table** */
+  } else if (scheme.pageType === 'table') {
+    let inline = ''
+    let largeWidth = ''
+    let itemStyle = ''
+    if (table) {
+      inline = 'inline="inline"'
+      largeWidth = 'width:100%;'
+      itemStyle = 'width: 100%; display: flex;'
+    }
+    const disabled = scheme.disabled ? `:disabled="${scheme.disabled}"` : ''
+    str = `<el-form ref="${scheme.formRef}" :model="${scheme.formModel}" :rules="${scheme.formRules}" size="${scheme.size}" ${disabled} label-width="${scheme.labelWidth}px" ${labelPosition} ${inline}>
+      <el-row>
+       <el-col :span="20">${child}</el-col>
+       <el-col :span="4" style='position: absolute;
+    right: 10px;
+    bottom: 25px;
+    text-align: right;'>${buildFromBtns(scheme, type, largeWidth, itemStyle)}</el-col>
+       </el-row>
+      
+    </el-form>
+      ${table}
+`
+    if (someSpanIsNot24) {
+      str = `<el-row :gutter="${scheme.gutter}">
+        ${str}
+        ${table}
+      </el-row>`
+    }
+    /** * page** */
+  } else {
+    str = ''
   }
+
   return str
 }
 
-function buildFromBtns(scheme, type) {
+function buildFromBtns(scheme, type, largeWidth, itemStyle) {
   let str = ''
+  if (scheme.formBtns && type === 'file' && scheme.pageType === 'table') {
+    str = `<el-col size="large" style="${largeWidth}  display: flex; flex-direction: row;"  >
+          <el-button style="${itemStyle} "type="primary" @click="submitForm">提交</el-button>
+          <el-button style="${itemStyle}" @click="resetForm">重置</el-button>
+        </el-col>`
+    if (someSpanIsNot24) {
+      str = `<el-col :span="24">
+          ${str}
+        </el-col>`
+    }
+  } else
   if (scheme.formBtns && type === 'file') {
-    str = `<el-form-item size="large">
-          <el-button type="primary" @click="submitForm">提交</el-button>
-          <el-button @click="resetForm">重置</el-button>
+    str = `<el-form-item size="large" style="${largeWidth}" >
+          <el-button style="${itemStyle} "type="primary" @click="submitForm">提交</el-button>
+          <el-button style="${itemStyle}" @click="resetForm">重置</el-button>
         </el-form-item>`
     if (someSpanIsNot24) {
       str = `<el-col :span="24">
@@ -78,6 +185,47 @@ function colWrapper(scheme, str) {
   return str
 }
 
+function renderTableTemp(key, props, container) {
+  if (!props || Object.keys(props).length === 0) return
+  if (key === 'attrs') {
+    Object.keys(props).forEach(prop => {
+      if (!props[prop] || props[prop] === '') {
+        return
+      }
+      if (['defaultValue', 'data', 'types', 'defaultSort'].indexOf(prop) === -1) {
+        if (typeof props[prop] === 'boolean') {
+          container.push(` ${prop} `)
+        } else {
+          container.push(` ${prop}='${JSON.stringify(props[prop])}' `)
+        }
+      } else if (prop === 'defaultSort') {
+        container.push(` :defaultSort='${JSON.stringify(props[prop])}' `)
+      }
+    })
+  } else
+  if (key === 'props') {
+    Object.keys(props).forEach(prop => {
+      container.push(` :${prop}=${JSON.stringify(props[prop])} `)
+    })
+  } else
+  if (key === 'nativeOn') {
+    Object.keys(props).forEach(prop => {
+      container.push(` ${prop}=${JSON.stringify(props[prop])} `)
+    })
+  } else
+  if (key === 'on') {
+    Object.keys(props).forEach(prop => {
+      container.push(` ${prop}=${JSON.stringify(props[prop])} `)
+    })
+  } else
+  if (key === 'style') {
+    let style = ''
+    Object.keys(props).forEach(prop => {
+      style += `{${prop}:${props[prop]}};`
+    })
+    container.push(` :style=${JSON.stringify(style)} `)
+  }
+}
 const layouts = {
   colFormItem(scheme) {
     const config = scheme.__config__
@@ -95,6 +243,31 @@ const layouts = {
     let str = `<el-form-item ${labelWidth} ${label} prop="${scheme.__vModel__}" ${required}>
         ${tagDom}
       </el-form-item>`
+    str = colWrapper(scheme, str)
+    return str
+  },
+  table(scheme) {
+    const config = scheme.__config__
+    const propsObj = makeDataObject()
+    buildDataObject(JSON.parse(JSON.stringify(scheme)), propsObj)
+    const className = this.activeId === scheme.__config__.formId
+      ? 'drawing-row-item active-from-item'
+      : 'drawing-row-item'
+    const children = scheme.__slot__ ? rederCoumns(scheme.__slot__.columns) : null
+    const type = scheme.type === 'default' ? '' : `type="${scheme.type}"`
+    const justify = scheme.type === 'default' ? '' : `justify="${scheme.justify}"`
+    const align = scheme.type === 'default' ? '' : `align="${scheme.align}"`
+    const gutter = scheme.gutter ? `:gutter="${scheme.gutter}"` : ''
+    const tableHtml = []
+    tableHtml.push('<el-table ')
+    Object.keys(propsObj).forEach(key => {
+      renderTableTemp(key, propsObj[key], tableHtml)
+      // tableHtml.push(` :${key}=${propsObj[key]}`)
+    })
+    tableHtml.push(`>${children}</el-table>`)
+    let str = `<el-row ${type} ${justify} ${align} ${gutter}>
+          ${tableHtml.join('')}
+         </el-row>`
     str = colWrapper(scheme, str)
     return str
   },
@@ -384,12 +557,18 @@ export function makeUpHtml(formConfig, type) {
   // 判断布局是否都沾满了24个栅格，以备后续简化代码结构
   someSpanIsNot24 = formConfig.fields.some(item => item.__config__.span !== 24)
   // 遍历渲染每个组件成html
+  let table = ''
   formConfig.fields.forEach(el => {
-    htmlList.push(layouts[el.__config__.layout](el))
+    if (el.__config__.tag !== ELEMENT_TAG.elTable) {
+      htmlList.push(layouts[el.__config__.layout](el))
+    } else {
+      table = layouts[el.__config__.layout](el)
+    }
   })
   const htmlStr = htmlList.join('\n')
+
   // 将组件代码放进form标签
-  let temp = buildFormTemplate(formConfig, htmlStr, type)
+  let temp = buildFormTemplate(formConfig, htmlStr, type, table)
   // dialog标签包裹代码
   if (type === 'dialog') {
     temp = dialogWrapper(temp)

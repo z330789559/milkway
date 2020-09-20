@@ -1,9 +1,11 @@
 import Vue from 'vue'
+import axios from 'axios'
 import VueRouter from 'vue-router'
 import Home from '@/views/index/Home.vue'
 
 Vue.use(VueRouter)
 
+Vue.prototype.$http = axios
 const routes = [
   {
     path: '/',

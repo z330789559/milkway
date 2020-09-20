@@ -13,11 +13,14 @@
   },
   "dependencies": {
     "@babel/parser": "^7.7.4",
+    "axios": "^0.20.0",
+    "axois": "0.0.1-security",
     "clipboard": "^2.0.4",
+    "copy-webpack-plugin": "^6.1.0",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11",
     "file-saver": "^2.0.2",
     "throttle-debounce": "^2.1.0",
+    "vue": "^2.6.11",
     "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
