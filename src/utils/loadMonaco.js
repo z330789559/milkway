@@ -36,7 +36,6 @@ export default function loadMonaco(cb) {
   ], () => {
     loading.close()
     // eslint-disable-next-line no-undef
-    debugger
     monacoEidtor = monaco
     cb(monacoEidtor)
   })
