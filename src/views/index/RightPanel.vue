@@ -358,6 +358,39 @@
             <el-divider />
           </template>
 
+          <template v-if="['el-table'].indexOf(activeData.__config__.tag) > -1">
+            <el-divider>添加表头</el-divider>
+            <el-form-item label="数据类型">
+              <el-button  @click="activeData.__slot__.columns.push({
+                prop: 'prop', label: '属性', width: 180, fixed: false
+              })" type="primary"
+               size="small">
+                添加列字段
+              </el-button>
+            </el-form-item>
+            <div v-for="(item, index) in activeData.__slot__.columns" :key="index" class="select-item">
+              <el-input v-model="item.label" placeholder="字段名称" size="middle" />
+              <el-input
+                placeholder="字段属性"
+                size="middle"
+                :value="item.prop"
+                @input="setPropValue(item,'prop',$event)"
+              />
+              <el-input
+                placeholder="列的宽度"
+                size="middle"
+                :value="item.width"
+                @input="setPropValue(item,'width', $event)"
+              />
+              <el-form-item label="fixed">
+                <el-switch v-model="item.fixed" />
+              </el-form-item>
+              <div class="close-btn select-line-icon" @click="activeData.__slot__.columns.splice(index, 1)">
+                <i class="el-icon-remove-outline" />
+              </div>
+            </div>
+          </template>
+
           <template v-if="['el-cascader'].indexOf(activeData.__config__.tag) > -1">
             <el-divider>选项</el-divider>
             <el-form-item label="数据类型">
@@ -652,7 +685,7 @@ import TreeNodeDialog from '@/views/index/TreeNodeDialog'
 import { isNumberStr } from '@/utils/index'
 import IconsDialog from './IconsDialog'
 import {
-  inputComponents, selectComponents, layoutComponents
+  inputComponents, selectComponents, layoutComponents, tableComponents
 } from '@/components/generator/config'
 import { saveFormConf } from '@/utils/db'
 
@@ -821,6 +854,7 @@ export default {
   watch: {
     formConf: {
       handler(val) {
+        debugger
         saveFormConf(val)
       },
       deep: true
@@ -877,6 +911,14 @@ export default {
     },
     addNode(data) {
       this.currentNode.push(data)
+    },
+
+    setPropValue(item, prop, val) {
+      if (!val) {
+        delete item[prop]
+        return
+      }
+      item[prop] = isNumberStr(val) ? +val : val
     },
     setOptionValue(item, val) {
       item.value = isNumberStr(val) ? +val : val
@@ -962,19 +1004,21 @@ export default {
       this.activeData[this.currentIconModel] = val
     },
     tagChange(tagIcon) {
+      debugger
       let target = inputComponents.find(item => item.__config__.tagIcon === tagIcon)
       if (!target) target = selectComponents.find(item => item.__config__.tagIcon === tagIcon)
+      if (!target) target = tableComponents.find(item => item.__config__.tagIcon === tagIcon)
       this.$emit('tag-change', target)
     },
     tableTypeChange(value) {
+      console.log(this.activeData)
       const { types } = this.activeData.__config__
-      const { activeData } = this
       types.forEach(type => {
         if (type.value !== '') {
           if (type.value !== value) {
-            activeData[type.value] = false
+            this.$set(this.activeData, type.value, false)
           } else {
-            activeData[type.value] = true
+            this.$set(this.activeData, type.value, true)
           }
         }
       })

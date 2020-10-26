@@ -21,7 +21,7 @@ const components = {
 }
 const layouts = {
   table(h, _element, index, parent) {
-    const element = JSON.parse(JSON.stringify(_element))
+    const element = _element
     const { activeItem } = this.$listeners
     const config = element.__config__
     const className = this.activeId === element.__config__.formId
@@ -107,6 +107,7 @@ const layouts = {
 }
 
 function renderChildren(h, element, index, parent) {
+  console.log(element)
   const config = element.__config__
   if (!Array.isArray(config.children)) return null
   return config.children.map((el, i) => {

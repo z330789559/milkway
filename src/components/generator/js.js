@@ -83,6 +83,9 @@ function buildAttributes(scheme, dataList, ruleList, optionsList, methodList, pr
       methodList.push(buildSubmitUpload(scheme))
     }
   }
+  if (scheme.action && config.tag === 'el-table') {
+    console.log('table')
+  }
 
   // 构建子级组件属性
   if (config.children) {

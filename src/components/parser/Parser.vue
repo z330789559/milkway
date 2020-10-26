@@ -14,7 +14,64 @@ const ruleTrigger = {
   'el-rate': 'change'
 }
 
+const components = {
+  itemBtns(h, element, index, parent) {
+    const { copyItem, deleteItem } = this.$listeners
+    return [
+      <span class="drawing-item-copy" title="复制" onClick={event => {
+        copyItem(element, parent); event.stopPropagation()
+      }}>
+        <i class="el-icon-copy-document" />
+      </span>,
+      <span class="drawing-item-delete" title="删除" onClick={event => {
+        deleteItem(index, parent); event.stopPropagation()
+      }}>
+        <i class="el-icon-delete" />
+      </span>
+    ]
+  }
+}
 const layouts = {
+  table(h, _element, index, parent) {
+    const element = _element
+    const { activeItem } = this.$listeners
+    const config = element.__config__
+    const className = this.activeId === element.__config__.formId
+      ? 'drawing-row-item active-from-item'
+      : 'drawing-row-item'
+    /**
+     *   给props 赋值
+     */
+    Object.keys(element.props).forEach(prop => {
+      if (prop === 'data') {
+        element.props[prop] = config.defaultValue
+      } else {
+        element.props[prop] = config[prop]
+      }
+    })
+    let child = <render key={config.renderKey} conf={element} onInput={ event => {
+      this.$set(config, 'defaultValue', event)
+    }} />
+    if (element.type === 'flex') {
+      child = <el-row type={element.type} justify={element.justify} align={element.align}>
+        {child}
+      </el-row>
+    }
+    return (
+      <el-col span={element.__config__.span}>
+        <el-row gutter={element.__config__.gutter} class={className}
+                nativeOnClick={event => {
+                  activeItem(element)
+                  event.stopPropagation()
+                }}>
+          <span class="component-name">{element.__config__.componentName}</span>
+          <draggable list={element.__config__.children} animation={340} group="componentsGroup" class="drag-wrapper">
+            {child}
+          </draggable>
+          {components.itemBtns.apply(this, arguments)}
+        </el-row>
+      </el-col>)
+  },
   colFormItem(h, scheme) {
     const config = scheme.__config__
     const listeners = buildListeners.call(this, scheme)

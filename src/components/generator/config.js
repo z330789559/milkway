@@ -150,6 +150,8 @@ export const inputComponents = [
   }
 ]
 
+
+
 // 选择型组件 【左面板】
 export const selectComponents = [
   {
@@ -602,18 +604,19 @@ export const tableComponents = [
       }, {
         prop: 'name', label: '名称', width: 180, fixed: false
       }, {
-        prop: 'address', label: '地址', fixed: false
+        prop: 'address', label: '地址', width: 'auto', fixed: false
       }]
     },
+    on: {
+
+    },
+    radio: false,
+    check: false,
+    maxHeight: 0,
     mountMethods: {},
     type: '',
     stripe: false,
     border: false,
-    icon: 'el-icon-table',
-    round: false,
-    size: 'medium',
-    plain: false,
-    circle: false,
-    disabled: false
+    icon: 'el-icon-table'
   }
 ]

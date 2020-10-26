@@ -10,13 +10,14 @@ import Parser from '../Parser'
 import axios from 'axios'
 
 function getQueryVariable(name) {
+  debugger
   const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`)
-  console.log(window.location.search)
-  const r = window.location.split('?')[1].match(reg)
+  console.log(window.location.href)
+  const r = window.location.href.split('?')[1].match(reg)
   if (r != null) return decodeURI(r[2])
   return null
 }
-const host = 'http://121.89.194.107:9300/'
+const host = ''
 
 // 若parser是通过安装npm方式集成到项目中的，使用此行引入
 // import Parser from 'form-gen-parser'
@@ -241,10 +242,11 @@ export default {
     const id = getQueryVariable('id')
     console.log(id)
     axios
-      .get(`${host}platform/api/smConfig/getDetail?id=${id}`)
+      .get(`${host}/bus/demon/query/${id}`)
       .then(res => {
-        if (res) {
-          this.formConf = res.value
+        debugger
+        if (res && res.status === 200) {
+          this.formConf = JSON.parse(res.data.content)
           // 更新表单
           this.initShow = true
         }

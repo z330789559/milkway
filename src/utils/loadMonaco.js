@@ -14,7 +14,7 @@ export default function loadMonaco(cb) {
     return
   }
 
-  const vs = 'https://lib.baomitu.com/monaco-editor/0.19.3/min/vs'
+  const vs = '/monaco-editor/0.19.3/min/vs'
 
   // 使用element ui实现加载提示
   const loading = ELEMENT.Loading.service({

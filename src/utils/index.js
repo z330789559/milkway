@@ -147,3 +147,9 @@ export function deepClone(obj) {
 
   return result
 }
+export function getStyle(ele, attr) {
+  if (window.getComputedStyle) {
+    return window.getComputedStyle(ele, null)[attr]
+  }
+  return ele.currentStyle[attr]
+}

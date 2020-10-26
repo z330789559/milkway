@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" @mousedown="startLayout" @mousemove="moveLayoutEvent" @mouseup="endLayout">
     <div class="left-board">
       <div class="logo-wrapper">
         <div class="logo">
@@ -42,7 +42,7 @@
       </el-scrollbar>
     </div>
 
-    <div class="center-board">
+    <div class="center-board" :style="'width:'+centerWidth+'px'">
       <div class="action-bar">
         <el-button icon="el-icon-video-play" type="text" @click="run">
           运行
@@ -95,6 +95,7 @@
 
     <right-panel
       :active-data="activeData"
+      :style="rightStyle"
       :form-conf="formConf"
       :show-field="!!drawingList.length"
       @tag-change="tagChange"
@@ -125,7 +126,7 @@
 <script>
 import draggable from 'vuedraggable'
 import axios from 'axios'
-import { debounce } from 'throttle-debounce'
+import { debounce, throttle } from 'throttle-debounce'
 import { saveAs } from 'file-saver'
 import ClipboardJS from 'clipboard'
 import render from '@/components/render/render'
@@ -136,7 +137,7 @@ import {
   inputComponents, selectComponents, layoutComponents, tableComponents, formConf
 } from '@/components/generator/config'
 import {
-  exportDefault, beautifierConf, isNumberStr, titleCase, deepClone
+  exportDefault, beautifierConf, isNumberStr, titleCase, deepClone, getStyle
 } from '@/utils/index'
 import {
   makeUpHtml, vueTemplate, vueScript, cssStyle
@@ -160,6 +161,9 @@ let tempActiveData
 const drawingListInDB = getDrawingList()
 const formConfInDB = getFormConf()
 const idGlobal = getIdGlobal()
+let leftBoard
+let rightBoard
+let centerBoard
 const host = 'http://127.0.0.1:8010/'
 export default {
   components: {
@@ -173,6 +177,10 @@ export default {
   },
   data() {
     return {
+      isLayout: false,
+      currentPoint: 0,
+      YWidth: 350,
+      screenWith: 0,
       logo,
       idGlobal,
       formConf,
@@ -193,6 +201,7 @@ export default {
       activeData: drawingDefalut[0],
       saveDrawingListDebounce: debounce(340, saveDrawingList),
       saveIdGlobalDebounce: debounce(340, saveIdGlobal),
+      moveLayoutdDebounce: undefined,
       leftComponents: [
         {
           title: '输入型组件',
@@ -213,6 +222,12 @@ export default {
     }
   },
   computed: {
+    centerWidth() {
+      return this.screenWith - this.YWidth - 260
+    },
+    rightStyle() {
+      return `width: ${this.YWidth}px;cursor:${this.isLayout ? 'move' : 'pointer'}`
+    }
   },
   watch: {
     // eslint-disable-next-line func-names
@@ -234,6 +249,7 @@ export default {
     },
     drawingList: {
       handler(val) {
+        debugger
         this.saveDrawingListDebounce(val)
         if (val.length === 0) this.idGlobal = 100
       },
@@ -246,7 +262,17 @@ export default {
       immediate: true
     }
   },
+  beforeMount() {
+    // 设置防抖方法(周期内按下多次只会执行最后一次)
+    this.debounceHandleValuesChange = throttle(100, this.moveLayout)
+  },
   mounted() {
+    rightBoard = document.querySelector('.right-board').getBoundingClientRect()
+    leftBoard = document.querySelector('.left-board').getBoundingClientRect()
+    centerBoard = document.querySelector('.center-board').getBoundingClientRect()
+    this.YWidth = rightBoard.width
+    this.screenWith = document.querySelector('body').getBoundingClientRect().width
+    axios('/statistics/app/v2/statistics/klaytn/overview')
     if (Array.isArray(drawingListInDB) && drawingListInDB.length > 0) {
       this.drawingList = drawingListInDB
     } else {
@@ -275,6 +301,33 @@ export default {
     })
   },
   methods: {
+    startLayout(e) {
+      if ((e.x > this.screenWith - this.YWidth) && (e.x < this.screenWith - this.YWidth + 10) && !this.isLayout) {
+        console.log('开始拖动')
+        this.isLayout = !this.isLayout
+        this.screenWith = document.querySelector('body').getBoundingClientRect().width
+        this.YWidth = this.YWidth === 350 ? rightBoard.width : this.YWidth
+        this.currentPoint = rightBoard.right
+      }
+    },
+    moveLayout(e) {
+      console.log(`t拖动中......${e.x}`)
+      this.YWidth = this.currentPoint - e.x
+      console.log(`当前点${this.currentPoint}移动距离${this.YWidth}`)
+    },
+    moveLayoutEvent(e) {
+      if (this.isLayout) {
+        this.$nextTick(() => {
+          this.debounceHandleValuesChange(e)
+        })
+      }
+    },
+    endLayout(e) {
+      if (this.isLayout) {
+        this.isLayout = !this.isLayout
+      }
+    },
+
     activeFormItem(element) {
       this.activeData = element
       this.activeId = element.__config__.formId
